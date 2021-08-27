@@ -51,7 +51,7 @@ class _Cuadrado extends StatelessWidget {
   Widget build(BuildContext context) {
     Random random = new Random();
 
-    int randomValor = (random.nextInt(150) + 80);
+    int randomValor = (random.nextInt(40) + 80);
 
     return Container(
       width: randomValor.toDouble(),
