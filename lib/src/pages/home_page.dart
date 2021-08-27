@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
             SizedBox(
               height: 30,
             ),
-            _Cuadrado(),
+            _Figura(),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: Row(
@@ -43,6 +43,18 @@ class HomePage extends StatelessWidget {
             )
           ],
         ));
+  }
+}
+
+
+class _Figura extends StatelessWidget {
+  const _Figura({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
+    );
   }
 }
 

@@ -14,7 +14,7 @@ class FormaProvider {
   static final StreamController<List<FormaModelo>> _streamFormaController =
       new StreamController.broadcast();
   List<FormaModelo> lista = [];
-  static Stream<List<FormaModelo>> get streamUsersController =>
+  static Stream<List<FormaModelo>> get streamController =>
       _streamFormaController.stream;
 
   void limpiarLista() {
