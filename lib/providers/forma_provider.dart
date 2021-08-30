@@ -1,47 +1,63 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:desafio2_firebase/models/forma_modelo.dart';
+import 'package:http/http.dart' as http;
 
-class FormaProvider {
-  static final FormaProvider _FormaProvider = new FormaProvider._();
+class FigurasProvider {
+  static final FigurasProvider _figurasProvider = new FigurasProvider._();
 
-  FormaProvider._();
+  FigurasProvider._();
 
-  factory FormaProvider() {
-    return _FormaProvider;
+  factory FigurasProvider() {
+    return _figurasProvider;
   }
 
-  static final StreamController<List<FormaModelo>> _streamFormaController =
-      new StreamController.broadcast();
+  static final StreamController<List<FormaModelo>>
+      _streamSeleccionFigurasController = new StreamController.broadcast();
+
   List<FormaModelo> lista = [];
-  static Stream<List<FormaModelo>> get streamController =>
-      _streamFormaController.stream;
+  List<FormaModelo> listaItemSelec = [];
+
+
+  static Stream<List<FormaModelo>> get streamFigurasController =>
+      _streamSeleccionFigurasController.stream;
 
   void limpiarLista() {
-    _streamFormaController.sink.add(List.empty());
+    _streamSeleccionFigurasController.sink.add(List.empty());
   }
 
-  void cargarListado(List<FormaModelo> lista) {
+  void cargarFiguras() async {
     this.lista = [];
     this.lista.addAll(lista);
-    _streamFormaController.sink.add(this.lista);
+    lista = await figurasFirebase();
+    _streamSeleccionFigurasController.sink.add(this.lista);
   }
 
-  // String agregar(String nombre, String edad, Sexo sexo) {
-  //   if (nombre.isEmpty) {
-  //     return 'Ingrese un nombre';
-  //   } else if (edad.isEmpty || int.tryParse(edad) == null) {
-  //     return 'Ingrese una edad';
-  //   }
-  //   final persona =
-  //       new PersonaModel(nombre: nombre, edad: int.parse(edad), sexo: sexo);
-  //   this.lista.add(persona);
-  //   _streamFormaController.sink.add(this.lista);
+  Future figurasFirebase() async {
+    List<FormaModelo> listaTemp = [];
+    final String _baseURL = "figuras-717c2-default-rtdb.firebaseio.com";
+    final url = Uri.https(_baseURL, 'Formas.json');
+    final respuesta = await http.get(url);
 
-  //   return '';
-  //}
+    final Map<String, dynamic> figurasMap = json.decode(respuesta.body);
+
+    figurasMap.forEach((key, value) {
+      final tempFigura = FormaModelo.fromJson(value);
+      
+     tempFigura.id = key;
+      listaTemp.add(tempFigura);
+    });
+    return listaTemp;
+  }
+void cargarSeleccion(String id, String descripcion) {
+    this.listaItemSelec = [];
+    this.listaItemSelec.addAll(listaItemSelec);
+   
+    _streamSeleccionFigurasController.sink.add(this.listaItemSelec);
+  }
+ 
 
   dispose() {
-    _streamFormaController.close();
+    _streamSeleccionFigurasController.close();
   }
 }

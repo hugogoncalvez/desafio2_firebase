@@ -1,12 +1,16 @@
+import 'package:desafio2_firebase/models/color_modelo.dart';
+import 'package:desafio2_firebase/models/forma_modelo.dart';
+import 'package:desafio2_firebase/providers/color_provider.dart';
+import 'package:desafio2_firebase/providers/forma_provider.dart';
+import 'package:desafio2_firebase/widgets/circulo.dart';
+import 'package:desafio2_firebase/widgets/cuadrado.dart';
+import 'package:desafio2_firebase/widgets/triangulo.dart';
+
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final List<String> formas = ['cuadrado', 'Círculo', 'Triángulo'];
-    final List<String> colores = ['Celeste', 'Rosado', 'Amarillo'];
-
     return Scaffold(
         appBar: AppBar(
           title: Text('Formas y Colores'),
@@ -15,24 +19,26 @@ class HomePage extends StatelessWidget {
         body: Column(
           children: [
             SizedBox(
-              height: 30,
+              height: 1,
             ),
-            _DropButtom(
-              formas: formas,
-            ),
-            _DropButtom(
-              formas: [],
-              colores: colores,
-            ),
+            _DropButtomFormas(),
+            _DropButtomColores(),
             SizedBox(
-              height: 30,
+              height: 5,
             ),
-            _Figura(),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'mostrarFigura');
+                      },
+                      child: Text('Mostrar Figura')),
+                  SizedBox(
+                    width: 20,
+                  ),
                   ElevatedButton(onPressed: () {}, child: Text('Agregar')),
                   SizedBox(
                     width: 20,
@@ -40,74 +46,93 @@ class HomePage extends StatelessWidget {
                   ElevatedButton(onPressed: () {}, child: Text('Sincronizar')),
                 ],
               ),
-            )
+            ),
+            SizedBox(
+              height: 10,
+            ),
           ],
         ));
   }
 }
 
-
 class _Figura extends StatelessWidget {
-  const _Figura({ Key? key }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      
-    );
+    return Circulo(color: '0xff0ffff4');
   }
 }
 
-class _Cuadrado extends StatelessWidget {
+class _DropButtomFormas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Random random = new Random();
-
-    int randomValor = (random.nextInt(40) + 80);
-
-    return Container(
-      width: randomValor.toDouble(),
-      height: randomValor.toDouble(),
-      decoration: BoxDecoration(color: Colors.blue),
-    );
-  }
-}
-
-class _DropButtom extends StatelessWidget {
-  final List<String>? formas;
-  final List<String>? colores;
-
-  const _DropButtom({this.formas, this.colores});
-
-  @override
-  Widget build(BuildContext context) {
-    List<String>? items = [];
-    if (formas!.isNotEmpty) {
-      items = formas;
-    } else {
-      items = colores;
-    }
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: DropdownButtonFormField(
-          onChanged: (_) {},
-          hint: Text('Seleccione Opcioón'),
-          icon: const Icon(Icons.arrow_downward),
-          iconSize: 24,
-          elevation: 16,
-          style: const TextStyle(color: Colors.deepPurple),
-          items: items!.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList()),
+      child: StreamBuilder(
+        stream: FigurasProvider.streamFigurasController,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (!snapshot.hasData) return Container();
+
+          return Container(
+            width: double.infinity,
+            height: 40,
+            child: DropdownButtonFormField(
+                onChanged: (_) {},
+                hint: Text('Seleccione Opción'),
+                icon: const Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                items: snapshot.data
+                    .map<DropdownMenuItem<String>>((FormaModelo value) {
+                  return DropdownMenuItem(
+                    onTap: () {
+                   
+                      final streamfiguras = FigurasProvider();
+                      streamfiguras.listaItemSelec.add(value);
+                    },
+                    value: value.id,
+                    child: Text(value.descripcion),
+                  );
+                }).toList()),
+          );
+        },
+      ),
     );
   }
 }
 
+class _DropButtomColores extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: StreamBuilder(
+        stream: ColorProvider.streamColoresController,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (!snapshot.hasData) return Container();
 
-//  '0xff00FFF9',
-//       '0Xffff0f9f',
-//       '0xffFFEA53'
+          return Container(
+            width: double.infinity,
+            height: 40,
+            child: DropdownButtonFormField(
+                onChanged: (_) {},
+                hint: Text('Seleccione Opción'),
+                icon: const Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                items: snapshot.data
+                    .map<DropdownMenuItem<String>>((ColorModelo value) {
+                  return DropdownMenuItem(
+                    value: value.color,
+                    child: Text(value.descripcion),
+                  );
+                }).toList()),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// 0xff0ffff4, 0xffff3fc3,  0xffffd459

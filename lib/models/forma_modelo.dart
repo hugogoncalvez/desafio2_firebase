@@ -15,7 +15,7 @@ class FormaModelo {
         this.descripcion,
     });
 
-    int? id;
+    String? id;
     String descripcion;
 
     factory FormaModelo.fromJson(Map<String, dynamic> json) => FormaModelo(

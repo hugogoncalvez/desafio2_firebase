@@ -17,7 +17,7 @@ class ColorModelo {
         this.color,
     });
 
-    int? id;
+    String? id;
     String descripcion;
     String color;
 
